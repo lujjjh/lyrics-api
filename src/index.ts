@@ -25,7 +25,8 @@ const handleRequest = async (event: FetchEvent) => {
   const { method } = request
   const { pathname, searchParams } = new URL(request.url)
   if (!(method === 'GET' && pathname === '/')) return notFound()
-  const name = searchParams.get('name')
+  // Remove the parenthetical contents.
+  const name = searchParams.get('name')?.replace(/\([^)]+\)/g, '')
   // The algorithm to find a best matched lyrics is:
   //   1. Search for the artist (and get the unique id)
   //   2. Search for the songs and filter out the songs belonging to the artist
