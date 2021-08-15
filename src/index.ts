@@ -1,6 +1,8 @@
 import { NetEase, Provider, QQMusic } from './providers'
 import { normalizeLRC } from './utils'
 
+const cache = caches.default
+
 addEventListener('fetch', (event) => {
   event.respondWith(handleRequest(event))
 })
@@ -16,6 +18,10 @@ const notFound = () =>
 
 const handleRequest = async (event: FetchEvent) => {
   const { request } = event
+
+  const response = await cache.match(request)
+  if (response) return response
+
   const { method } = request
   const { pathname, searchParams } = new URL(request.url)
   if (!(method === 'GET' && pathname === '/')) return notFound()
@@ -34,12 +40,16 @@ const handleRequest = async (event: FetchEvent) => {
   const promises = providers.map((provider) => provider.getBestMatched({ name, artist }).catch(() => {}))
 
   for await (const lyrics of promises) {
-    if (lyrics)
-      return new Response(normalizeLRC(lyrics), {
+    if (lyrics) {
+      const response = new Response(normalizeLRC(lyrics), {
         headers: {
           'content-type': 'text/plain; charset=utf-8',
+          'cache-control': 'max-age=2592000, s-maxage=31536000, stale-while-revalidate=2592000',
         },
       })
+      event.waitUntil(cache.put(request, response.clone()))
+      return response
+    }
   }
 
   return notFound()
