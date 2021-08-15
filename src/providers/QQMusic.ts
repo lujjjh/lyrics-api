@@ -34,9 +34,7 @@ export class QQMusic implements Provider {
     )
     if (!songs) return
 
-    const matchedSong = songs.find(
-      ({ singer }: any) => singer instanceof Array && singer.some(({ id }) => id === artistId)
-    )
+    const matchedSong = songs.find(({ singer }: any) => singer?.[0]?.id === artistId)
     if (!matchedSong) return
 
     const { lyric } = await fetchJSON(

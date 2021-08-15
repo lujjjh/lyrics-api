@@ -28,7 +28,7 @@ const handleRequest = async (event: FetchEvent) => {
   if (!name || !artist) return notFound()
 
   // Order by (the quality of the LRCs).
-  const providers: Provider[] = [new NetEase(), new QQMusic()]
+  const providers: Provider[] = [new QQMusic(), new NetEase()]
 
   // But still request in parallel...
   const promises = providers.map((provider) => provider.getBestMatched({ name, artist }).catch(() => {}))

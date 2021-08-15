@@ -31,9 +31,7 @@ export class NetEase implements Provider {
         type: '1',
       })
     )
-    const matchedSong = songs.find(
-      ({ artists }: any) => artists instanceof Array && artists.some(({ id }) => id === artistId)
-    )
+    const matchedSong = songs.find(({ artists }: any) => artists?.[0]?.id === artistId)
     if (!matchedSong) return
 
     const { lrc } = await fetchJSON(
