@@ -29,12 +29,15 @@ export class QQMusic implements Provider {
     } = await fetchJSON(
       createURLWithQuery(new URL('soso/fcgi-bin/client_search_cp', BASE_URL), {
         format: 'json',
-        w: [name, artist].join(' '),
+        w: name,
+        n: '50',
       })
     )
     if (!songs) return
 
-    const matchedSong = songs.find(({ singer }: any) => singer?.[0]?.id === artistId)
+    const matchedSong = songs
+      .filter(({ singer }: any) => singer?.[0]?.id === artistId)
+      .find(({ songname_hilight }: any) => String(songname_hilight).includes('<em>'))
     if (!matchedSong) return
 
     const { lyric } = await fetchJSON(

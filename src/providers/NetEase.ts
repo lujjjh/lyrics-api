@@ -1,7 +1,7 @@
 import { createURLWithQuery, fetchJSON } from '../utils'
 import { Provider, SearchParams } from './Provider'
 
-const BASE_URL = 'http://music.163.com/api/'
+const BASE_URL = 'https://music.163.com/api/'
 
 export class NetEase implements Provider {
   private async getArtistId(artist: string): Promise<number | undefined> {
@@ -26,12 +26,13 @@ export class NetEase implements Provider {
       result: { songs },
     } = await fetchJSON(
       createURLWithQuery(new URL('search/pc', BASE_URL), {
-        s: [name, artist].join(' '),
-        limit: '10',
+        s: name,
+        limit: '50',
         type: '1',
       })
     )
-    const matchedSong = songs.find(({ artists }: any) => artists?.[0]?.id === artistId)
+    const matchedSongs = songs.filter(({ artists }: any) => artists?.[0]?.id === artistId)
+    const matchedSong = matchedSongs.find((song: any) => String(song.name).includes(name)) ?? matchedSongs[0]
     if (!matchedSong) return
 
     const { lrc } = await fetchJSON(
