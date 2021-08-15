@@ -4,23 +4,27 @@ import { SearchParams } from './Provider'
 
 const BASE_URL = 'https://c.y.qq.com/'
 
+interface ArtistInfo {
+  mid: string
+  name: string
+}
+
 export class QQMusic implements Provider {
-  async getArtistId(artist: string): Promise<number | undefined> {
+  async getArtistInfo(artist: string): Promise<ArtistInfo | undefined> {
     const {
-      data: { zhida },
-    } = await fetchJSON(
-      createURLWithQuery(new URL('soso/fcgi-bin/client_search_cp', BASE_URL), {
-        format: 'json',
-        w: artist,
-        catZhida: '1',
-      })
-    )
-    return zhida?.zhida_singer?.singerID
+      data: { singer },
+    } = await fetchJSON(createURLWithQuery(new URL('splcloud/fcgi-bin/smartbox_new.fcg', BASE_URL), { key: artist }))
+    const matchedArtist = singer?.itemlist?.[0]
+    if (!matchedArtist) return
+    return {
+      mid: matchedArtist.mid,
+      name: matchedArtist.name,
+    }
   }
 
   async getBestMatched({ name, artist }: SearchParams) {
-    const artistId = await this.getArtistId(artist)
-    if (!artistId) return
+    const artistInfo = await this.getArtistInfo(artist)
+    if (!artistInfo) return
 
     const {
       data: {
@@ -29,14 +33,14 @@ export class QQMusic implements Provider {
     } = await fetchJSON(
       createURLWithQuery(new URL('soso/fcgi-bin/client_search_cp', BASE_URL), {
         format: 'json',
-        w: name,
-        n: '50',
+        w: [name, artistInfo.name].join(' '),
+        n: '10',
       })
     )
     if (!songs) return
 
     const matchedSong = songs
-      .filter(({ singer }: any) => singer?.[0]?.id === artistId)
+      .filter(({ singer }: any) => singer?.[0]?.mid === artistInfo.mid)
       .find(({ songname_hilight }: any) => String(songname_hilight).includes('<em>'))
     if (!matchedSong) return
 
