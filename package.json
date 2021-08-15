@@ -1,0 +1,19 @@
+{
+  "name": "lyrics-api",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "npm run build && concurrently 'npm run build -- --watch' 'wrangler dev -h lyrics-api.lujjjh.com'",
+    "build": "tsup src/index.ts --sourcemap",
+    "publish": "npm run build && wrangler publish"
+  },
+  "keywords": [],
+  "author": "Jiahao Lu <lujjjh@gmail.com>",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^2.2.2",
+    "concurrently": "^6.2.0",
+    "prettier-plugin-organize-imports": "^2.3.3",
+    "tsup": "^4.13.1",
+    "typescript": "^4.3.5"
+  }
+}
