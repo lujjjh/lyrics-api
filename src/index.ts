@@ -26,12 +26,18 @@ const handleRequest = async (event: FetchEvent) => {
   const { pathname, searchParams } = new URL(request.url)
   if (!(method === 'GET' && pathname === '/')) return notFound()
   // Remove the parenthetical contents.
-  const name = searchParams.get('name')?.replace(/\([^)]+\)/g, '')
+  const name = searchParams
+    .get('name')
+    ?.replace(/\([^)]+\)/g, '')
+    ?.trim()
   // The algorithm to find a best matched lyrics is:
   //   1. Search for the artist (and get the unique id)
   //   2. Search for the songs and filter out the songs belonging to the artist
   // So, let's preserve only the first artist to let the algorithm work.
-  const artist = searchParams.get('artist')?.replace(/\S*&.*$/, '')
+  const artist = searchParams
+    .get('artist')
+    ?.replace(/[,&].*/, '')
+    ?.trim()
   if (!name || !artist) return notFound()
 
   // Order by (the quality of the LRCs).
