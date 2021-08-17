@@ -3,7 +3,7 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "dev": "npm run build && concurrently 'npm run build -- --watch' 'wrangler dev -h lyrics-api.lujjjh.com'",
+    "dev": "npm run build && concurrently 'npm run build -- --watch' 'wrangler dev'",
     "build": "tsup src/index.ts --sourcemap",
     "publish": "npm run build && wrangler publish"
   },
