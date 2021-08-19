@@ -1,6 +1,8 @@
 export interface SearchParams {
   name: string
   artist: string
+  rawName: string
+  rawArtist: string
 }
 
 export type Lyrics = string

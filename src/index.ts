@@ -59,21 +59,26 @@ const handleRequest = async (event: FetchEvent) => {
   return response
 }
 
-const searchLyrics = async (params: SearchParams) => {
+const searchLyrics = async (params: Pick<SearchParams, 'name' | 'artist'>) => {
+  const rawName = params.name
+  const rawArtist = params.artist
+
   // Remove the parenthetical contents.
-  const name = params.name?.replace(/\([^)]+\)/g, '')?.trim()
+  const name = rawName.replace(/\([^)]+\)/g, '')?.trim()
   // The algorithm to find a best matched lyrics is:
   //   1. Search for the artist (and get the unique id)
   //   2. Search for the songs and filter out the songs belonging to the artist
   // So, let's preserve only the first artist to let the algorithm work.
-  const artist = params.artist?.replace(/[,&].*/, '')?.trim()
+  const artist = rawArtist.replace(/[,&].*/, '')?.trim()
   if (!name || !artist) return notFound()
 
   // Order by (the quality of the LRCs).
   const providers: Provider[] = [new GitHub(), new QQMusic(), new NetEase()]
 
   // But still request in parallel...
-  const promises = providers.map((provider) => provider.getBestMatched({ name, artist }).catch(() => {}))
+  const promises = providers.map((provider) =>
+    provider.getBestMatched({ name, artist, rawName, rawArtist }).catch(() => {})
+  )
 
   for await (const lyrics of promises) {
     if (lyrics) {
