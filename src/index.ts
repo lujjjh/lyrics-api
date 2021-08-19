@@ -1,4 +1,4 @@
-import { NetEase, Provider, QQMusic, SearchParams } from './providers'
+import { GitHub, NetEase, Provider, QQMusic, SearchParams } from './providers'
 import { createURLWithQuery, normalizeLRC } from './utils'
 
 const cache = caches.default
@@ -70,7 +70,7 @@ const searchLyrics = async (params: SearchParams) => {
   if (!name || !artist) return notFound()
 
   // Order by (the quality of the LRCs).
-  const providers: Provider[] = [new QQMusic(), new NetEase()]
+  const providers: Provider[] = [new GitHub(), new QQMusic(), new NetEase()]
 
   // But still request in parallel...
   const promises = providers.map((provider) => provider.getBestMatched({ name, artist }).catch(() => {}))

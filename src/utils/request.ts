@@ -23,5 +23,8 @@ export function withTimeout<F extends (...args: any[]) => any>(this: any, f: F, 
   }
 }
 
+export const fetchText = async (input: string, init?: RequestInit): Promise<string> =>
+  assertResponseOk(await withTimeout(fetch, 5000)(input, init)).text()
+
 export const fetchJSON = async <T>(input: string, init?: RequestInit): Promise<T> =>
   assertResponseOk(await withTimeout(fetch, 5000)(input, init)).json()

@@ -35,7 +35,7 @@ export class NetEase implements Provider {
       result: { songs },
     } = await fetchJSON(
       createURLWithQuery(new URL('search/pc', BASE_URL), {
-        s: [name, artistInfo.name],
+        s: [name, artistInfo.name].join(' '),
         limit: '50',
         type: '1',
       })
