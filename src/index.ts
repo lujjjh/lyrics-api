@@ -1,5 +1,5 @@
 import { GitHub, NetEase, Provider, QQMusic, SearchParams } from './providers'
-import { createURLWithQuery, normalizeLRC } from './utils'
+import { createURLWithQuery, getUserId, normalizeLRC } from './utils'
 
 const cache = caches.default
 
@@ -18,10 +18,32 @@ const notFound = () =>
 
 const handleRequest = async (event: FetchEvent) => {
   const { request } = event
+  const { pathname } = new URL(request.url)
+  if (request.method !== 'GET') return notFound()
 
-  const { method } = request
-  const { pathname, searchParams } = new URL(request.url)
-  if (!(method === 'GET' && pathname === '/')) return notFound()
+  switch (pathname) {
+    case '/user':
+      return handleUserRequest(event)
+    case '/':
+      return handleSearchLyricsRequest(event)
+    default:
+      return notFound()
+  }
+}
+
+const handleUserRequest = async (event: FetchEvent) => {
+  return new Response(JSON.stringify({ user_id: await getUserId(event.request) }), {
+    headers: {
+      'content-type': 'application/json',
+      'cache-control': 'no-cache',
+    },
+  })
+}
+
+const handleSearchLyricsRequest = async (event: FetchEvent) => {
+  const { request } = event
+  const { searchParams } = new URL(event.request.url)
+
   const name = searchParams.get('name')?.trim()
   const artist = searchParams.get('artist')?.trim()
   if (!name || !artist) return notFound()
@@ -39,12 +61,7 @@ const handleRequest = async (event: FetchEvent) => {
   // Logging.
   {
     const status = response.status
-    const ip = request.headers.get('cf-connecting-ip') ?? ''
-    // To avoid logging the original IP, use SHA-1(ip) as user id.
-    const user_id = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(ip))))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('')
-      .slice(0, 5)
+    const user_id = await getUserId(request)
     event.waitUntil(
       log({
         status,
