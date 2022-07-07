@@ -8,6 +8,12 @@ interface ArtistInfo {
   name: string
 }
 
+const headers = {
+  'user-agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  cookie: 'NMTID=',
+}
+
 export class NetEase implements Provider {
   private async getArtistInfo(artist: string): Promise<ArtistInfo | undefined> {
     const {
@@ -17,7 +23,8 @@ export class NetEase implements Provider {
         s: artist,
         limit: '1',
         type: '100',
-      })
+      }),
+      { headers }
     )
     const matchedArtist = artists?.[0]
     if (!matchedArtist) return
@@ -38,7 +45,8 @@ export class NetEase implements Provider {
         s: [name, artistInfo.name].join(' '),
         limit: '50',
         type: '1',
-      })
+      }),
+      { headers }
     )
     const matchedSongs = songs.filter(({ artists }: any) => artists?.[0]?.id === artistInfo.id)
     const matchedSong = matchedSongs.find((song: any) => String(song.name).includes(name)) ?? matchedSongs[0]
