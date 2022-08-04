@@ -1,8 +1,8 @@
 name = "lyrics-api"
-account_id = "3f3f7b6b86669a040fcfbf088dc613ae"
+type = "webpack"
+route = ''
+zone_id = ''
+usage_model = ''
+compatibility_flags = []
 workers_dev = true
-compatibility_date = "2022-06-07"
-main = "dist/index.js"
-
-[build]
-watch_dir = "dist"
+compatibility_date = "2022-08-04"

@@ -1,4 +1,4 @@
-import { GitHub, NetEase, Provider, QQMusic, SearchParams } from './providers'
+import { GitHub, NetEase, Provider, QQMusic, LyricSify, SearchParams } from './providers'
 import { createURLWithQuery, getUserId, normalizeLRC } from './utils'
 
 const cache = caches.default
@@ -62,15 +62,15 @@ const handleSearchLyricsRequest = async (event: FetchEvent) => {
   {
     const status = response.status
     const user_id = await getUserId(request)
-    event.waitUntil(
-      log({
-        status,
-        user_id,
-        name,
-        artist,
-        hit,
-      })
-    )
+    // event.waitUntil(
+    //   log({
+    //     status,
+    //     user_id,
+    //     name,
+    //     artist,
+    //     hit,
+    //   })
+    // )
   }
 
   return response
@@ -90,11 +90,11 @@ const searchLyrics = async (params: Pick<SearchParams, 'name' | 'artist'>) => {
   if (!name || !artist) return notFound()
 
   // Order by (the quality of the LRCs).
-  const providers: Provider[] = [new GitHub(), new QQMusic(), new NetEase()]
+  const providers: Provider[] = [new LyricSify(), new GitHub(), new QQMusic(), new NetEase()]
 
   // But still request in parallel...
   const promises = providers.map((provider) =>
-    provider.getBestMatched({ name, artist, rawName, rawArtist }).catch(() => {})
+    provider.getBestMatched({ name, artist, rawName, rawArtist }).catch(() => { })
   )
 
   for await (const lyrics of promises) {
@@ -112,14 +112,14 @@ const searchLyrics = async (params: Pick<SearchParams, 'name' | 'artist'>) => {
   return notFound()
 }
 
-const log = (payload: any) => {
-  const source = LOGFLARE_SOURCE
-  return fetch(createURLWithQuery('https://api.logflare.app/logs/json', { source }), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-KEY': LOGFLARE_API_KEY,
-    },
-    body: JSON.stringify([payload]),
-  })
-}
+// const log = (payload: any) => {
+//   const source = LOGFLARE_SOURCE
+//   return fetch(createURLWithQuery('https://api.logflare.app/logs/json', { source }), {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'X-API-KEY': LOGFLARE_API_KEY,
+//     },
+//     body: JSON.stringify([payload]),
+//   })
+// }

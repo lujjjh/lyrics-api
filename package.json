@@ -3,9 +3,9 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "dev": "npm run build && concurrently 'npm run build -- --watch' 'wrangler dev'",
+    "dev": "npm run build && npx concurrently \"npm run build -- --watch\" \"npx wrangler dev\"",
     "build": "tsup src/index.ts --sourcemap",
-    "publish": "npm run build && wrangler publish"
+    "publish": "npm run build && npx wrangler publish"
   },
   "keywords": [],
   "author": "Jiahao Lu <lujjjh@gmail.com>",
